@@ -200,51 +200,130 @@ The client respects poe.ninja's rate limits by:
 The project includes comprehensive tests to ensure reliability:
 
 ```bash
-# Run all unit tests
+# Run all unit tests (library functions)
 cargo test
 
-# Run integration tests (CLI command validation)
-cargo test --test cli_tests
+# Run comprehensive integration tests (CLI parsing, handlers, edge cases)
+cargo test --test integration_tests
 
-# Run network-dependent integration tests (requires internet)
-cargo test --test cli_tests --features network-tests
-
-# Run all tests including comprehensive integration tests
+# Run API compatibility tests (requires internet connection)
 cargo test --test integration_tests --features network-tests
+
+# Run specific test categories
+cargo test cli_tests          # CLI argument parsing tests
+cargo test handler_tests      # Business logic with mock data
+cargo test property_tests     # Property-based testing with random inputs
+cargo test helper_tests       # Utility function tests
+cargo test snapshot_tests     # Help output validation
+cargo test edge_case_tests    # Edge cases and error conditions
 ```
 
 ### Test Coverage
 
-**Unit Tests:**
+**Unit Tests (17 tests in `src/lib.rs`):**
 
-- API client functionality
-- Data structure serialization/deserialization
-- Type compatibility with poe.ninja API
+- Currency and item filtering functions
+- Sorting algorithms
+- Helper functions for leagues and types
+- Data structure validation
 
-**Integration Tests:**
+**Integration Tests (28 tests in `tests/integration_tests.rs`):**
 
-- CLI argument parsing and validation
-- Command help text and structure
-- Error handling for invalid inputs
-- Basic command functionality (leagues, types)
+**CLI Argument Parsing Tests (8 tests):**
 
-**Network Integration Tests** (optional):
+- Command parsing validation
+- Default value handling
+- Short argument forms
+- Invalid argument rejection
+- Required parameter validation
 
-- Live API calls to poe.ninja
-- End-to-end command execution
-- Real data fetching and formatting
+**Handler Tests (6 tests):**
+
+- Currency filtering and sorting with mock data
+- Item price range filtering
+- Name-based filtering (case-insensitive)
+- Combined filtering operations
+- Business logic validation
+
+**Property-based Tests (3 tests):**
+
+- Random input validation using `proptest`
+- League name parsing with arbitrary strings
+- Chaos value parsing with random floats
+- Item type validation
+
+**Helper Function Tests (4 tests):**
+
+- Available leagues list validation
+- Currency types verification
+- Item types comprehensive checking
+- Static data integrity
+
+**Snapshot Tests (3 tests):**
+
+- Help output structure validation
+- Subcommand help text verification
+- CLI documentation consistency
+
+**Edge Case Tests (4 tests):**
+
+- Empty data handling
+- Case-insensitive filtering
+- Extreme price values (0.0 to 999999.0)
+- Boundary condition testing
+
+**API Compatibility Tests (6 tests - requires `network-tests` feature):**
+
+- Live poe.ninja API integration
+- Currency and item endpoint validation
+- Data structure compatibility
+- Multiple item/currency type testing
+- Field mapping verification
 
 ### Test Examples
 
 ```bash
-# Quick validation (no network required)
-cargo test test_help_displays_correctly
-cargo test test_leagues_command_works
-cargo test test_types_command_works
+# Quick validation (no network required) - 45 tests
+cargo test
 
-# Comprehensive testing with network calls
+# Test CLI argument parsing specifically
+cargo test test_currency_command_parsing
+cargo test test_item_command_parsing
+
+# Test business logic with mock data
+cargo test test_currency_filtering
+cargo test test_item_price_filtering
+
+# Test edge cases
+cargo test test_case_insensitive_filtering
+cargo test test_extreme_chaos_values
+
+# Full integration testing with live API calls
 cargo test --features network-tests
 ```
+
+### Test Categories Explained
+
+**Fast Tests (no network):** All library unit tests, CLI parsing, mock data handlers, property-based tests, and edge cases. These run quickly and can be executed frequently during development.
+
+**Network Tests:** Live API calls to poe.ninja for end-to-end validation. These require internet connection and test real API compatibility.
+
+**Property-based Tests:** Use `proptest` to generate random inputs and verify that parsing and validation logic handles edge cases correctly.
+
+**Snapshot Tests:** Verify that help output and CLI documentation remain consistent across changes.
+
+### Testing Philosophy
+
+The testing approach follows multiple strategies:
+
+1. **Unit Testing:** Core business logic with deterministic inputs
+2. **Integration Testing:** CLI parsing and command validation
+3. **Mock Testing:** Handler logic with controlled test data
+4. **Property Testing:** Random input validation for robustness
+5. **End-to-end Testing:** Live API compatibility verification
+6. **Edge Case Testing:** Boundary conditions and error handling
+
+This comprehensive approach ensures the CLI remains reliable and functional as the codebase evolves.
 
 ## License
 
